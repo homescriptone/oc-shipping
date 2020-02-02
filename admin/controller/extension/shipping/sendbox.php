@@ -229,18 +229,26 @@ class ControllerExtensionShippingSendbox extends Controller {
         $user_token = $server_obj["QUERY_STRING"];
         parse_str($user_token, $output);
         $token = $output['user_token'];
-        $route = $output['route'];
         $_url = $server_obj["PHP_SELF"];
         $domain = $server_obj["HTTP_HOST"];
         $domain_name = $domain.$_url;
 
-        $state_params =  '{url:' .$domain_name.'route:'.$route.'user_token:'.$token . '}';
-        //var_dump($state_params);
-        //die();
-        // $state_params = $server_obj["HTTP_HOST"] . $server_obj['PHP_SELF'].'/'. $server_obj["QUERY_STRING"];
+        $http_scheme = $server_obj['HTTPS'];
+        $http_sch = "http://";
+        if ($http_scheme){
+            $http_sch = "https://";
+        }
+
+        $route = $output['route'];
+
+        $state_params =  $http_sch.$domain_name.'?route='.$route.'&user_token='.$token ;
+
+        var_dump($state_params);
+        die();
 
         $sendbox_url = 'https://api.sendbox.co/oauth/access?app_id='.$app_id.'&redirect_url='.$static_url.'&state='.$state_params.'&scopes='.$scopes;
         //SEND EVERYBODY TO TWIG
+
 
         // $sendbox_url = 'https://api.sendbox.co/oauth/access?' ;
         $data['sendbox_url'] = $sendbox_url;
@@ -251,6 +259,9 @@ class ControllerExtensionShippingSendbox extends Controller {
         $data['url'] = $domain_name;
         $data['route'] = $route;
         $data['token']=$token;
+
+        var_dump($sendbox_url);
+        die();
 
         $this->response->setOutput($this->load->view('/shipping/sendbox', $data));
 
